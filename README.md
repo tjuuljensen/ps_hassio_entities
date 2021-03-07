@@ -16,19 +16,53 @@ This script use Home Assistant [python_script](https://www.home-assistant.io/int
 
 ## Usage
 
-### Set both state and attributes
+### 1. Set both state and attributes
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| action | string | (*Required*) `set_state_attributes` Allows to set both state and attributes |
-| entity_id | string | (*Required*) Entity ID of the sensor to be set |
-| state | string | (*Required*) The state to be set |
-| attributes | list | (*Required*) List of attributes to be set (the actual list of attributes depends on the referred entity) |
-| log_enabled | bool | Indicates whether to log system messages to the Home Assistant log (see [Logging](#logging) for further details) |
+| Name | Type | Required | Description |
+| ---- | :--: | :------: | ----------- |
+| action | string | Yes | `set_state_attributes` <br/>Allows to set both state and attributes. |
+| entity_id | string | Yes | Entity ID of the sensor to be set. |
+| state | string | Yes | The state to be set. |
+| attributes | list | Yes | List of attributes to be set (the actual list of attributes depends on the referred entity). |
+| log_enabled | bool | No | Indicates whether to log system messages to the Home Assistant log (see [Logging](#logging) for further details). |
 
-**Lovelace Sample**:
+#### 1.1. Automation Sample
 
-![Sample](sample.gif)
+```yaml
+- alias: paolo_home_since
+  trigger:
+    - platform: state
+      entity_id: device_tracker.paolo
+      from: "not_home"
+      to: "home"
+  action:
+    - service: python_script.hass_entities
+      data:
+        action: set_state_attributes
+        entity_id: sensor.paolo_home_from
+        state: "{{ 'At home since '~ now().strftime('%H.%M') }}"
+        attributes:
+          - icon: mdi:home
+```
+
+#### 1.2. Script Sample
+
+```yaml
+turn_on_switch:
+  sequence:
+    - service: switch.turn_on
+      data:
+        entity_id: switch.plug_1
+    - service: python_script.hass_entities
+      data:
+        action: set_state_attributes
+        entity_id: sensor.plug_1_status
+        state: "{{ 'Switched on at '~ now().strftime('%H.%M') }}"
+        attributes:
+          - icon: mdi:toggle-switch
+```
+
+#### 1.3. Lovelace Sample
 
 ```yaml
 - type: entities
@@ -61,16 +95,50 @@ This script use Home Assistant [python_script](https://www.home-assistant.io/int
         log_enabled: True
 ```
 
-### Set state only
+![Sample](sample.gif)
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| action | string | (*Required*) `set_state` Allows to set a sensor state only |
-| entity_id | string | (*Required*) Entity ID of the sensor to be set |
-| state | string | (*Required*) The state to be set |
-| log_enabled | bool | Indicates whether to log system messages to the Home Assistant log (see [Logging](#logging) for further details) |
+### 2. Set state only
 
-**Lovelace Sample**:
+| Name | Type | Required | Description |
+| ---- | :--: | :------: | ----------- |
+| action | string | Yes | `set_state` <br/>Allows to set a sensor state only. |
+| entity_id | string | Yes | Entity ID of the sensor to be set. |
+| state | string | Yes | The state to be set. |
+| log_enabled | bool | No | Indicates whether to log system messages to the Home Assistant log (see [Logging](#logging) for further details). |
+
+#### 2.1. Automation Sample
+
+```yaml
+- alias: paolo_home_since
+  trigger:
+    - platform: state
+      entity_id: device_tracker.paolo
+      from: "not_home"
+      to: "home"
+  action:
+    - service: python_script.hass_entities
+      data:
+        action: set_state
+        entity_id: sensor.paolo_home_from
+        state: "{{ 'At home since '~ now().strftime('%H.%M') }}"
+```
+
+#### 2.2. Script Sample
+
+```yaml
+turn_on_switch:
+  sequence:
+    - service: switch.turn_on
+      data:
+        entity_id: switch.plug_1
+    - service: python_script.hass_entities
+      data:
+        action: set_state
+        entity_id: sensor.plug_1_status
+        state: "{{ 'Switched on at '~ now().strftime('%H.%M') }}"
+```
+
+#### 2.3. Lovelace Sample
 
 ```yaml
 - type: entities
@@ -95,16 +163,52 @@ This script use Home Assistant [python_script](https://www.home-assistant.io/int
         log_enabled: True
 ```
 
-### Set attributes only
+### 3. Set attributes only
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| action | string | (*Required*) `set_attributes` Allows to set a sensor attributes only |
-| entity_id | string | (*Required*) Entity ID of the sensor to be set |
-| attributes | list | (*Required*) List of attributes to be set (the actual list of attributes depends on the referred entity) |
-| log_enabled | bool | Indicates whether to log system messages to the Home Assistant log (see [Logging](#logging) for further details) |
+| Name | Type | Required | Description |
+| ---- | :--: | :------: | ----------- |
+| action | string | Yes | `set_attributes` <br/>Allows to set a sensor attributes only. |
+| entity_id | string | Yes | Entity ID of the sensor to be set. |
+| attributes | list | Yes | List of attributes to be set (the actual list of attributes depends on the referred entity). |
+| log_enabled | bool | No | Indicates whether to log system messages to the Home Assistant log (see [Logging](#logging) for further details). |
 
-**Lovelace Sample**:
+#### 3.1. Automation Sample
+
+```yaml
+- alias: paolo_home_since
+  trigger:
+    - platform: state
+      entity_id: device_tracker.paolo
+      from: "not_home"
+      to: "home"
+  action:
+    - service: python_script.hass_entities
+      data:
+        action: set_attributes
+        entity_id: sensor.paolo_home_from
+        attributes:
+          - icon: mdi:home
+          - time: "{{ now().strftime('%H.%M') }}"
+```
+
+#### 3.2. Script Sample
+
+```yaml
+turn_on_switch:
+  sequence:
+    - service: switch.turn_on
+      data:
+        entity_id: switch.plug_1
+    - service: python_script.hass_entities
+      data:
+        action: set_attributes
+        entity_id: sensor.plug_1_status
+        attributes:
+          - icon: mdi:toggle-switch
+          - time: "{{ now().strftime('%H.%M') }}"
+```
+
+#### 3.3. Lovelace Sample
 
 ```yaml
 - type: entities
@@ -131,16 +235,45 @@ This script use Home Assistant [python_script](https://www.home-assistant.io/int
         log_enabled: True
 ```
 
-### Delete an existing attribute
+### 4. Delete an existing attribute
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| action | string | (*Required*) `delete_attribute` Delete an existing attribute |
-| entity_id | string | (*Required*) Entity ID of the sensor to be set |
-| attribute | string | (*Required*) Attribute to be deleted from the sensor definition |
-| log_enabled | bool | Indicates whether to log system messages to the Home Assistant log (see [Logging](#logging) for further details) |
+| Name | Type | Required | Description |
+| ---- | :--: | :------: | ----------- |
+| action | string | Yes | `delete_attribute` <br/>Delete an existing attribute. |
+| entity_id | string | Yes | Entity ID of the sensor to be set. |
+| attribute | string | Yes | Attribute to be deleted from the sensor definition. |
+| log_enabled | bool | No | Indicates whether to log system messages to the Home Assistant log (see [Logging](#logging) for further details). |
 
-**Lovelace Sample**:
+#### 4.1. Automation Sample
+
+```yaml
+- alias: paolo_not_home
+  trigger:
+    - platform: state
+      entity_id: device_tracker.paolo
+      from: "home"
+      to: "not_home"
+  action:
+    - service: python_script.hass_entities
+      data:
+        action: delete_attribute
+        entity_id: sensor.paolo_home_from
+        attribute: time
+```
+
+#### 4.2. Script Sample
+
+```yaml
+turn_on_switch:
+  sequence:
+    - service: python_script.hass_entities
+      data:
+        action: delete_attribute
+        entity_id: sensor.plug_1_status
+        attribute: icon
+```
+
+#### 4.3. Lovelace Sample
 
 ```yaml
 - type: entities
